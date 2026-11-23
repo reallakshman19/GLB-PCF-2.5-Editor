@@ -1,6 +1,7 @@
 name: Deploy editor to GitHub Pages
 
 on:
+  pull_request:
   push:
     branches: [main]
   workflow_dispatch:
@@ -43,16 +44,19 @@ jobs:
         run: node tools/verify-pages-site.mjs _site
 
       - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
         with:
           enablement: true
 
       - name: Upload site artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
   deploy:
+    if: github.event_name != 'pull_request'
     name: Publish GitHub Pages
     runs-on: ubuntu-latest
     needs: build
